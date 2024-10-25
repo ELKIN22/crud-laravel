@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Producto;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -21,9 +22,10 @@ class ProductosController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        $categorias = Categoria::all();
+        return view('Producto.create',compact('categorias'));
     }
 
     /**
@@ -31,7 +33,26 @@ class ProductosController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'nombre' => 'required|max:255|min:5',
+            'precio' => 'required|numeric',
+            'id_categoria' => 'required|exists:categorias,id'
+        ],[
+            'nombre.required' => 'El nombre del producto es requerido.',
+            'nombre.max' => 'El nombre no puede se mayor a :max',
+            'nombre.min' => 'El nombe no puede ser menor a :min',
+            'precio.required' => 'El precio es requerido.',
+            'precio.numeric' => 'El precio debe ser un numero.',
+            'id_categoria.required' => 'La categoría es requerida',
+            'id_categoria.exists' => 'La categoría seleccionada no es válida.',
+        ]);
+
+        Producto::create(
+            array_merge($request->all(), ['activo' => 1])
+        );
+
+        return redirect()->route('productos.index')->with('Creación', 'Producto creado correctamente.');
     }
 
     /**

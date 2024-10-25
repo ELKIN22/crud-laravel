@@ -18,6 +18,7 @@ class Producto extends Model
         'activo' => 'boolean'
     ];
 
+
     public function categoria() {
         return $this->belongsTo(Categoria::class, 'id_categoria');
     }
